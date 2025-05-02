@@ -105,19 +105,92 @@ c('.pizzaInfo--addButton').addEventListener('click', ()=>{
    
 })
 
+c('.menu-openner').addEventListener('click', ()=> {
+    if (carrinho.length > 0) {
+        c('aside').style.left = '0';
+    }
+})
+
+c('.menu-closer').addEventListener('click', ()=>{
+    c('aside').style.left = '100vw';
+})
+
 function updateCarrinho(){
+    c('.menu-openner span').innerHTML = carrinho.length;
+
     if (carrinho.length > 0) {
         console.log(carrinho.length)
         c('aside').classList.add('show');
+        
+        c('.cart').innerHTML = '';
+
+        let subtotal = 0;
+        let desconto = 0;
+        let total = 0;
+
         for(let i in carrinho){
             let pizzaItem = pizzaJson.find((item)=> item.id == carrinho[i].id)
             console.log(pizzaItem);
+
+            subtotal += pizzaItem.price * carrinho[i].qt;
+
+            let carrinhoItem = c('.models .cart--item').cloneNode(true);
+
+
+            let pizzaSizeName;
+
+            switch (carrinho[i].size) {
+                case 0:
+                    pizzaSizeName = 'P'
+                    break;
+                case 1:
+                    pizzaSizeName = 'M'
+                    break;
+                case 2:
+                    pizzaSizeName = 'G'
+                    break;
+                default:
+                    break;
+            }
+
+            let pizzaName = `${pizzaItem.name} (${pizzaSizeName})`
+            carrinhoItem.querySelector('img').src = pizzaItem.img;
+            carrinhoItem.querySelector('.cart--item-nome').innerHTML = pizzaName;
+            carrinhoItem.querySelector('.cart--item--qt').innerHTML = carrinho[i].qt;
+
+            carrinhoItem.querySelector('.cart--item-qtmais').addEventListener('click', () => {
+                carrinho[i].qt++;
+                updateCarrinho();
+            })
+
+            carrinhoItem.querySelector('.cart--item-qtmenos').addEventListener('click', () => {
+                if (carrinho[i].qt > 1) {
+                    carrinho[i].qt--;
+                }
+                else{
+                    carrinho.splice(i, 1);
+                }
+
+                updateCarrinho();
+            })
+
+            c('.cart').append(carrinhoItem);
         }
+
+        desconto = subtotal * 0.1;
+        total = subtotal - desconto;
+
+        c('.subtotal span:last-child').innerHTML = `R$ ${subtotal.toFixed(2)}`;
+        c('.desconto span:last-child').innerHTML = `R$ ${desconto.toFixed(2)}`;
+        c('.total span:last-child').innerHTML = `R$ ${total.toFixed(2)}`;
     }
     else{
         c('aside').classList.remove('show');
+        c('aside').style.left = '100vw';
     }
 }
+
+
 
 
 
